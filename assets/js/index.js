@@ -211,47 +211,136 @@ commercialBtn.addEventListener("click", function () {
 // ........................................................................................................................
 // select all element which i need
 var cards = document.querySelectorAll(".testimonial-card");
-var indicators = document.querySelectorAll(".carousel-indicator");
 var next = document.querySelector("#next-testimonial");
 var prev = document.querySelector("#prev-testimonial");
 var carousel = document.querySelector("#testimonials-carousel");
+var indicatorsContainer = document.querySelector("#carousel-indicators");
 var currentIndex = 0;
 
-indicators.forEach(function (indicator, index) {
-    indicator.addEventListener("click", function () {
-        currentIndex = index;
-        movrCarousel();
-    })
-})
-
-next.addEventListener("click", function () {
-    currentIndex += 1;
-    if (currentIndex > 3) {
-        currentIndex = 0;
+// Get number of visible cards
+function getVisibleCards() {
+    if (window.innerWidth < 640) {
+        return 1;
+    } else if (window.innerWidth < 1024) {
+        return 2;
+    } else {
+        return 3;
     }
-    movrCarousel();
-})
+}
 
-prev.addEventListener("click", function () {
-    currentIndex -= 1;
-    if (currentIndex < 0) {
-        currentIndex = 3;
+// Get maximum index
+function getMaxIndex() {
+    return cards.length - getVisibleCards();
+}
+
+// Create indicators
+function createIndicators() {
+    indicatorsContainer.innerHTML = "";
+    var numberOfIndicators = getMaxIndex() + 1;
+    for (var i = 0; i < numberOfIndicators; i++) {
+        var indicator = document.createElement("button");
+        indicator.classList.add(
+            "carousel-indicator",
+            "w-3",
+            "h-3",
+            "rounded-full",
+            "bg-slate-400",
+            "dark:bg-slate-600",
+            "transition-all",
+            "duration-300",
+            "hover:scale-125",
+            "cursor-pointer"
+        );
+        indicator.setAttribute(
+            "data-index",
+            i
+        );
+        indicator.setAttribute(
+            "role",
+            "tab"
+        );
+        if (i == 0) {
+            indicator.classList.remove(
+                "bg-slate-400",
+                "dark:bg-slate-600"
+            );
+            indicator.classList.add("bg-accent");
+        } else {
+            indicator.setAttribute(
+                "type",
+                "button"
+            );
+        }
+            indicator.addEventListener("click", function () {
+                currentIndex = Number(
+                    this.getAttribute("data-index")
+                );
+                moveCarousel();
+            });
+        indicatorsContainer.appendChild(indicator);
     }
-    movrCarousel();
-})
+}
 
-function movrCarousel() {
+// Move carousel
+function moveCarousel() {
+    var visibleCards = getVisibleCards();
+    var movePercentage = 100 / visibleCards;
     carousel.style.transform = `
-        translateX(${currentIndex * (100 / 3)}%)
+        translateX(${currentIndex * movePercentage}%)
     `;
+    // Update indicators
+    var indicators = document.querySelectorAll(
+        ".carousel-indicator"
+    );
     indicators.forEach(function (indicator, index) {
         if (index == currentIndex) {
-            indicator.classList.replace("dark:bg-slate-600", "bg-accent");
+            indicator.classList.remove(
+                "bg-slate-400",
+                "dark:bg-slate-600"
+            );
+            indicator.classList.add(
+                "bg-accent"
+            );
         } else {
-            indicator.classList.add("dark:bg-slate-600")
+            indicator.classList.remove(
+                "bg-accent"
+            );
+            indicator.classList.add(
+                "bg-slate-400",
+                "dark:bg-slate-600"
+            );
         }
     });
 }
+
+//Next button
+next.addEventListener("click", function () {
+    currentIndex += 1;
+    if (currentIndex > getMaxIndex()) {
+        currentIndex = 0;
+    }
+    moveCarousel();
+});
+
+//Previous button
+prev.addEventListener("click", function () {
+    currentIndex -= 1;
+    if (currentIndex < 0) {
+        currentIndex = getMaxIndex();
+    }
+    moveCarousel();
+});
+
+//screen resize
+window.addEventListener("resize", function () {
+    var maxIndex = getMaxIndex();
+    if (currentIndex > maxIndex) {
+        currentIndex = maxIndex;
+    }
+    createIndicators();
+});
+createIndicators();
+moveCarousel();
 // ........................................................................................................................
 // ........................................................................................................................
 // ........................................................................................................................
@@ -286,13 +375,6 @@ closeSetion.addEventListener("click", function () {
     settingSection.classList.replace("translate-x-0", "translate-x-full");
 })
 
-
-
-
-
-
-
-
 // select theme-colors-grid
 var themeColorsGrid = document.querySelector("#theme-colors-grid");
 // array
@@ -304,6 +386,7 @@ var themeColors = [
     "#F14151",
     "#EF7B0B",
 ];
+
 themeColors.forEach(function (color, index) {
     // create buttons
     var colorButton = document.createElement("button");
@@ -338,8 +421,6 @@ themeColors.forEach(function (color, index) {
     themeColorsGrid.append(colorButton);
 });
 
-
-
 // Get saved theme
 var savedTheme = localStorage.getItem("themeColor");
 if (savedTheme) {
@@ -354,8 +435,6 @@ if (savedTheme) {
         }
     });
 }
-
-
 
 // select elements
 var fontOptions = document.querySelectorAll(".font-option");
@@ -377,7 +456,6 @@ fontOptions.forEach(function (fontOption) {
     });
 });
 
-
 // Get saved font
 var savedFont = localStorage.getItem("selectedFont");
 if (savedFont) {
@@ -393,8 +471,6 @@ if (savedFont) {
         }
     });
 }
-
-
 
 var resetSettings = document.querySelector("#reset-settings");
 resetSettings.addEventListener("click", function () {
@@ -422,45 +498,20 @@ resetSettings.addEventListener("click", function () {
     });
     allColorButtons[0].classList.add("activeee");
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+// ........................................................................................................................
+// ........................................................................................................................
+// ........................................................................................................................
+// ........................................................................................................................
+// ........................................................................................................................
+// ........................................................................................................................
+// ........................................................................................................................
+// ........................................................................................................................
+// ........................................................................................................................
+// ........................................................................................................................
+// ........................................................................................................................
+// ........................................................................................................................
+// ........................................................................................................................
+// ........................................................................................................................
 var heroSection = document.querySelector("#hero-section");
 var scrollToUp = document.querySelector("#scroll-to-top");
 
@@ -481,21 +532,17 @@ scrollToUp.addEventListener("click", function () {
         behavior: "smooth"
     });
 })
-
-
-
-
-
-
-
-
-
-
-
-// var scrollToUp = document.querySelector("#scroll-to-top");
-// sections.forEach(function(item){
-//     if(item.id != "hero-section"){
-//         scrollToUp.classList.remove("opacity-0");
-//         scrollToUp.classList.remove("invisible");
-//     }
-// })
+// ........................................................................................................................
+// ........................................................................................................................
+// ........................................................................................................................
+// ........................................................................................................................
+// ........................................................................................................................
+// ........................................................................................................................
+// ........................................................................................................................
+// ........................................................................................................................
+// ........................................................................................................................
+// ........................................................................................................................
+// ........................................................................................................................
+// ........................................................................................................................
+// ........................................................................................................................
+// ........................................................................................................................
